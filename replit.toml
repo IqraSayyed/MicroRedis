@@ -1,0 +1,7 @@
+# Replit configuration for MicroRedis
+# This makes Replit auto-detect how to run the server.
+
+run = "python mini_redis.py"
+
+[env]
+HOST = "0.0.0.0"
