@@ -3,253 +3,393 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MicroRedis - A Redis Clone in Python</title>
+    <title>MicroRedis — A Redis Clone in Python</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0d1117;
-            --card: #161b22;
-            --border: #30363d;
-            --text: #e6edf3;
-            --muted: #8b949e;
-            --red: #ff6b6b;
-            --accent: #58a6ff;
-            --green: #3fb950;
-            --purple: #bc8cff;
+            --bg: #f7f8fb;
+            --surface: #ffffff;
+            --ink: #0f172a;
+            --muted: #64748b;
+            --brand: #f43f5e;      /* rose */
+            --brand2: #8b5cf6;      /* violet */
+            --brand3: #0ea5e9;      /* sky */
+            --border: #e2e8f0;
+            --shadow: 0 10px 40px -12px rgba(15, 23, 42, 0.12);
+            --radius: 20px;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', -apple-system, sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
             background: var(--bg);
-            color: var(--text);
+            color: var(--ink);
             line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
         }
-        .container { max-width: 900px; margin: 0 auto; padding: 0 20px; }
-        header {
-            padding: 60px 0 30px;
-            text-align: center;
+        code, .mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* ---- Ambient gradient blobs ---- */
+        .glow {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(90px);
+            opacity: .45;
+            z-index: -1;
+            pointer-events: none;
+        }
+        .glow-1 { width: 520px; height: 520px; background: var(--brand); top: -160px; left: -120px; }
+        .glow-2 { width: 420px; height: 420px; background: var(--brand2); top: 20%; right: -140px; }
+        .glow-3 { width: 460px; height: 460px; background: var(--brand3); bottom: -160px; left: 30%; }
+
+        /* ---- Nav ---- */
+        nav {
+            position: sticky; top: 0; z-index: 50;
+            backdrop-filter: blur(12px);
+            background: rgba(247, 248, 251, .8);
             border-bottom: 1px solid var(--border);
         }
-        .logo {
-            font-size: 4rem;
-            font-weight: 800;
-            letter-spacing: 2px;
-            background: linear-gradient(135deg, var(--red), var(--accent));
-            -webkit-background-clip: text;
+        .nav-inner {
+            max-width: 1080px; margin: 0 auto; padding: 16px 24px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.15rem; letter-spacing: -.02em; }
+        .brand .dot {
+            width: 30px; height: 30px; border-radius: 9px;
+            background: linear-gradient(135deg, var(--brand), var(--brand2));
+            display: grid; place-items: center; color: #fff; font-size: .9rem;
+            box-shadow: 0 4px 14px -4px rgba(244, 63, 94, .6);
+        }
+        .nav-links { display: flex; gap: 24px; align-items: center; }
+        .nav-links a { color: var(--muted); text-decoration: none; font-size: .9rem; font-weight: 500; transition: color .2s; }
+        .nav-links a:hover { color: var(--ink); }
+        .gh-btn {
+            background: var(--ink); color: #fff !important;
+            padding: 8px 16px; border-radius: 10px; font-weight: 600;
+            display: inline-flex; align-items: center; gap: 8px;
+            transition: transform .2s, box-shadow .2s;
+        }
+        .gh-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px -8px rgba(15,23,42,.4); }
+
+        .container { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+        /* ---- Hero ---- */
+        header { padding: 88px 0 64px; text-align: center; position: relative; }
+        .eyebrow {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: #fff; border: 1px solid var(--border);
+            padding: 6px 14px; border-radius: 999px;
+            font-size: .82rem; font-weight: 600; color: var(--muted);
+            box-shadow: var(--shadow);
+        }
+        .eyebrow .live { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; animation: pulse 1.6s infinite; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+        h1 {
+            font-size: clamp(2.6rem, 6vw, 4.5rem);
+            font-weight: 800; letter-spacing: -.04em; line-height: 1.05;
+            margin: 24px auto 18px; max-width: 760px;
+        }
+        .gradient-text {
+            background: linear-gradient(120deg, var(--brand), var(--brand2) 50%, var(--brand3));
+            -webkit-background-clip: text; background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        .tagline {
-            color: var(--muted);
-            font-size: 1.2rem;
-            margin-top: 10px;
+        .sub {
+            color: var(--muted); font-size: clamp(1.05rem, 2vw, 1.3rem);
+            max-width: 620px; margin: 0 auto 32px; font-weight: 400;
         }
-        .badges {
-            margin-top: 20px;
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        .badge {
-            background: var(--card);
-            border: 1px solid var(--border);
-            padding: 5px 14px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            color: var(--muted);
-        }
-        .badge.green { color: var(--green); border-color: var(--green); }
-        .badge.red { color: var(--red); border-color: var(--red); }
-        .badge.blue { color: var(--accent); border-color: var(--accent); }
-        .badge.purple { color: var(--purple); border-color: var(--purple); }
-        section { padding: 50px 0; }
-        h2 {
-            font-size: 1.8rem;
-            margin-bottom: 25px;
-            color: var(--accent);
-        }
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-        .feature {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 25px;
-            transition: transform 0.2s;
-        }
-        .feature:hover { transform: translateY(-4px); }
-        .feature .icon { font-size: 2rem; margin-bottom: 12px; }
-        .feature h3 { margin-bottom: 8px; color: var(--text); }
-        .feature p { color: var(--muted); font-size: 0.95rem; }
-        .terminal {
-            background: #010409;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 20px;
-            font-family: 'Consolas', 'Courier New', monospace;
-            font-size: 0.9rem;
-            overflow-x: auto;
-        }
-        .terminal .cmd { color: var(--green); }
-        .terminal .out { color: var(--muted); }
-        .terminal .err { color: var(--red); }
-        code {
-            background: var(--card);
-            border: 1px solid var(--border);
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: 'Consolas', monospace;
-            font-size: 0.9em;
-            color: var(--accent);
-        }
-        .steps {
-            list-style: none;
-            counter-reset: step;
-        }
-        .steps li {
-            counter-increment: step;
-            margin-bottom: 15px;
-            padding-left: 45px;
-            position: relative;
-        }
-        .steps li::before {
-            content: counter(step);
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 30px;
-            height: 30px;
-            background: var(--accent);
-            color: #fff;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-        }
-        footer {
-            border-top: 1px solid var(--border);
-            padding: 30px 0;
-            text-align: center;
-            color: var(--muted);
-        }
-        footer a { color: var(--accent); text-decoration: none; }
+        .hero-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
         .btn {
-            display: inline-block;
-            background: var(--accent);
-            color: #fff;
-            padding: 12px 24px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            margin-top: 15px;
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 13px 26px; border-radius: 12px; font-weight: 600; font-size: .95rem;
+            text-decoration: none; transition: transform .2s, box-shadow .2s;
         }
-        .btn:hover { background: #4a9cf8; }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--brand), var(--brand2));
+            color: #fff; box-shadow: 0 10px 30px -8px rgba(244,63,94,.5);
+        }
+        .btn-primary:hover { transform: translateY(-2px); }
+        .btn-ghost { background: #fff; color: var(--ink); border: 1px solid var(--border); }
+        .btn-ghost:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+        .hero-stats { display: flex; gap: 40px; justify-content: center; margin-top: 44px; flex-wrap: wrap; }
+        .stat { text-align: center; }
+        .stat b { display: block; font-size: 1.6rem; font-weight: 800; letter-spacing: -.02em; }
+        .stat span { color: var(--muted); font-size: .82rem; font-weight: 500; }
+
+        /* ---- Terminal mock ---- */
+        .terminal-wrap { max-width: 720px; margin: 56px auto 0; text-align: left; }
+        .terminal {
+            background: #0b1020; border-radius: var(--radius); overflow: hidden;
+            box-shadow: 0 30px 70px -20px rgba(15,23,42,.45);
+            border: 1px solid rgba(255,255,255,.08);
+        }
+        .term-bar { display: flex; align-items: center; gap: 8px; padding: 14px 18px; background: rgba(255,255,255,.04); }
+        .term-bar i { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+        .term-bar i:nth-child(1){background:#ff5f57}.term-bar i:nth-child(2){background:#febc2e}.term-bar i:nth-child(3){background:#28c840}
+        .term-title { margin-left: 10px; color: #8b96ab; font-size: .8rem; }
+        .term-body { padding: 20px 22px; font-size: .88rem; }
+        .term-body .line { display: block; margin-bottom: 8px; white-space: pre-wrap; }
+        .c { color: #7ee787; } .o { color: #8b96ab; } .k { color: #79c0ff; } .v { color: #ffa657; }
+
+        /* ---- Sections ---- */
+        section { padding: 70px 0; }
+        .sec-head { text-align: center; max-width: 640px; margin: 0 auto 46px; }
+        .sec-head .kicker { color: var(--brand2); font-weight: 700; font-size: .8rem; text-transform: uppercase; letter-spacing: .12em; }
+        .sec-head h2 { font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 800; letter-spacing: -.03em; margin: 10px 0 12px; }
+        .sec-head p { color: var(--muted); }
+
+        /* ---- Feature cards ---- */
+        .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 28px;
+            transition: transform .25s, box-shadow .25s, border-color .25s;
+            position: relative; overflow: hidden;
+        }
+        .card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, var(--brand), var(--brand2), var(--brand3));
+            opacity: 0; transition: opacity .25s;
+        }
+        .card:hover { transform: translateY(-6px); box-shadow: var(--shadow); border-color: transparent; }
+        .card:hover::before { opacity: 1; }
+        .card .icon {
+            width: 48px; height: 48px; border-radius: 13px; display: grid; place-items: center;
+            font-size: 1.4rem; margin-bottom: 16px;
+            background: linear-gradient(135deg, rgba(244,63,94,.12), rgba(139,92,246,.12));
+        }
+        .card h3 { font-size: 1.12rem; font-weight: 700; margin-bottom: 8px; letter-spacing: -.01em; }
+        .card p { color: var(--muted); font-size: .92rem; }
+        .card code { background: var(--bg); padding: 2px 6px; border-radius: 6px; font-size: .85em; }
+
+        /* ---- Commands table ---- */
+        .cmd-card {
+            background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+            padding: 12px; box-shadow: var(--shadow);
+        }
+        .cmd-row {
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;
+            padding: 14px 18px; align-items: center;
+            border-radius: 12px; transition: background .2s;
+        }
+        .cmd-row:hover { background: var(--bg); }
+        .cmd-row + .cmd-row { border-top: 1px solid var(--border); }
+        .cmd-row .cmd { font-weight: 600; font-size: .9rem; }
+        .cmd-row .desc { color: var(--muted); font-size: .88rem; }
+        .cmd-row .example { color: var(--brand2); font-size: .85rem; font-family: 'JetBrains Mono', monospace; }
+        .cmd-row .example .resp { color: #22c55e; }
+
+        /* ---- How to run ---- */
+        .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
+        .step {
+            background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+            padding: 26px; position: relative;
+        }
+        .step .num {
+            width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center;
+            font-weight: 700; color: #fff; margin-bottom: 16px;
+            background: linear-gradient(135deg, var(--brand), var(--brand2));
+        }
+        .step p { color: var(--muted); font-size: .9rem; margin-top: 8px; }
+        .step code { background: var(--bg); padding: 2px 6px; border-radius: 6px; font-size: .85em; }
+
+        /* ---- CTA ---- */
+        .cta {
+            text-align: center; padding: 70px 0 90px;
+        }
+        .cta-box {
+            max-width: 760px; margin: 0 auto; padding: 52px 40px;
+            background: linear-gradient(135deg, var(--brand), var(--brand2));
+            border-radius: 28px; color: #fff;
+            box-shadow: 0 30px 70px -25px rgba(139,92,246,.5);
+        }
+        .cta-box h2 { font-size: clamp(1.8rem, 4vw, 2.4rem); font-weight: 800; letter-spacing: -.02em; }
+        .cta-box p { margin: 12px 0 26px; opacity: .9; }
+        .cta-box .btn { background: #fff; color: var(--ink); }
+        .cta-box .btn:hover { transform: translateY(-2px); }
+
+        footer { border-top: 1px solid var(--border); padding: 34px 0; text-align: center; color: var(--muted); font-size: .88rem; }
+        footer a { color: var(--brand2); text-decoration: none; font-weight: 600; }
+
+        @media (max-width: 640px) {
+            .nav-links a:not(.gh-btn){ display:none; }
+            .cmd-row { grid-template-columns: 1fr; gap: 2px; }
+            .cmd-row + .cmd-row { border-top: none; }
+        }
     </style>
 </head>
 <body>
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+    <div class="glow glow-3"></div>
+
+    <nav>
+        <div class="nav-inner">
+            <div class="brand"><span class="dot">⚡</span> MicroRedis</div>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#commands">Commands</a>
+                <a href="#run">Get Started</a>
+                <a class="gh-btn" href="https://github.com/IqraSayyed/MicroRedis" target="_blank">★ View on GitHub</a>
+            </div>
+        </div>
+    </nav>
+
     <header>
         <div class="container">
-            <div class="logo">MICROREDIS</div>
-            <p class="tagline">A multi-threaded Redis clone built from scratch in Python</p>
-            <div class="badges">
-                <span class="badge green">🐍 Python 3</span>
-                <span class="badge red">⚡ In-Memory</span>
-                <span class="badge blue">🧵 Multi-Threaded</span>
-                <span class="badge purple">💾 AOF Persistence</span>
-                <span class="badge">🌐 TCP Server</span>
+            <span class="eyebrow"><span class="live"></span> Built from scratch in Python</span>
+            <h1>A <span class="gradient-text">Redis clone</span><br>built for learning.</h1>
+            <p class="sub">A multi-threaded, crash-durable key-value store with real TCP networking — written entirely with Python's standard library.</p>
+            <div class="hero-actions">
+                <a class="btn btn-primary" href="#run">Get Started →</a>
+                <a class="btn btn-ghost" href="https://github.com/IqraSayyed/MicroRedis" target="_blank">Browse the Code</a>
+            </div>
+            <div class="hero-stats">
+                <div class="stat"><b>5</b><span>Build Phases</span></div>
+                <div class="stat"><b>0</b><span>External Dependencies</span></div>
+                <div class="stat"><b>∞</b><span>Concurrent Clients</span></div>
+            </div>
+        </div>
+
+        <div class="terminal-wrap container">
+            <div class="terminal">
+                <div class="term-bar">
+                    <i></i><i></i><i></i><span class="term-title">microredis — server</span>
+                </div>
+                <div class="term-body">
+                    <span class="line"><span class="c">$</span> <span class="k">python</span> mini_redis.py</span>
+                    <span class="line"><span class="o">[SERVER] MicroRedis started on 0.0.0.0:6379</span></span>
+                    <span class="line"><span class="c">$</span> <span class="k">nc</span> <span class="v">localhost 6379</span></span>
+                    <span class="line"><span class="k">SET</span> <span class="v">username Iqra</span> &nbsp;<span class="o">→</span> <span class="c">OK</span></span>
+                    <span class="line"><span class="k">GET</span> <span class="v">username</span> &nbsp;&nbsp;&nbsp;<span class="o">→</span> <span class="c">Iqra</span></span>
+                    <span class="line"><span class="k">DEL</span> <span class="v">username</span> &nbsp;&nbsp;&nbsp;<span class="o">→</span> <span class="c">(integer) 1</span></span>
+                </div>
             </div>
         </div>
     </header>
 
-    <section>
+    <section id="features">
         <div class="container">
-            <h2>Try It Live</h2>
-            <div class="terminal">
-                <div><span class="cmd">$ python mini_redis.py</span></div>
-                <div><span class="out">[SERVER] MiniRedis server started on 127.0.0.1:6379</span></div>
-                <div><span class="out">[SERVER] Multi-threaded mode: Each client gets its own thread</span></div>
-                <div><span class="out">[SERVER] Waiting for client connections...</span></div>
-                <br>
-                <div><span class="out"># From another terminal:</span></div>
-                <div><span class="cmd">$ nc 127.0.0.1 6379</span></div>
-                <div><span class="cmd">SET username Iqra</span> <span class="out">→ OK</span></div>
-                <div><span class="cmd">GET username</span> <span class="out">→ Iqra</span></div>
-                <div><span class="cmd">DEL username</span> <span class="out">→ (integer) 1</span></div>
-                <div><span class="cmd">GET username</span> <span class="out">→ (nil)</span></div>
+            <div class="sec-head">
+                <span class="kicker">Capabilities</span>
+                <h2>Everything it does, beautifully.</h2>
+                <p>Each layer of the database is built up phase by phase — from raw memory to durable networking.</p>
             </div>
-        </div>
-    </section>
-
-    <section>
-        <div class="container">
-            <h2>What It Can Do</h2>
             <div class="features">
-                <div class="feature">
+                <div class="card">
                     <div class="icon">⚡</div>
                     <h3>In-Memory Storage</h3>
-                    <p>Lightning-fast key-value storage entirely in RAM, powered by Python dictionaries.</p>
+                    <p>Lightning-fast key-value storage entirely in RAM, powered by native Python dictionaries.</p>
                 </div>
-                <div class="feature">
+                <div class="card">
                     <div class="icon">🧵</div>
                     <h3>Multi-Threaded</h3>
-                    <p>Handles many clients simultaneously. Each connection runs on its own thread with locks for safety.</p>
+                    <p>Handles many clients at once. Each connection runs on its own thread with <code>threading.Lock()</code> for safety.</p>
                 </div>
-                <div class="feature">
+                <div class="card">
                     <div class="icon">🌐</div>
-                    <h3>TCP Networking</h3>
-                    <p>A real TCP socket server built with Python's <code>socket</code> library, so clients connect over the network.</p>
+                    <h3>Real TCP Networking</h3>
+                    <p>A genuine TCP socket server built with Python's <code>socket</code> library — clients connect over the network.</p>
                 </div>
-                <div class="feature">
+                <div class="card">
                     <div class="icon">💾</div>
                     <h3>AOF Persistence</h3>
-                    <p>Append-Only File logging means your data survives crashes and restarts.</p>
+                    <p>Append-Only File logging means your data survives crashes and restarts intact.</p>
                 </div>
-                <div class="feature">
+                <div class="card">
                     <div class="icon">🗣️</div>
                     <h3>Redis-Style Commands</h3>
-                    <p>Understands <code>SET</code>, <code>GET</code>, and <code>DEL</code> with proper error handling and case-insensitive parsing.</p>
+                    <p>Understands <code>SET</code>, <code>GET</code>, and <code>DEL</code> with clean error handling and case-insensitive parsing.</p>
                 </div>
-                <div class="feature">
+                <div class="card">
                     <div class="icon">🛡️</div>
-                    <h3>Thread-Safe</h3>
-                    <p>Uses <code>threading.Lock()</code> to prevent race conditions when many clients write at once.</p>
+                    <h3>Race-Condition Safe</h3>
+                    <p>Locks protect shared state so concurrent writers never corrupt the store.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <section>
+    <section id="commands" style="background:#fff;">
         <div class="container">
-            <h2>Run It Yourself</h2>
-            <ol class="steps">
-                <li><strong>Clone the repo:</strong> <code>git clone https://github.com/IqraSayyed/MicroRedis.git</code></li>
-                <li><strong>Start the server:</strong> <code>cd MicroRedis && python mini_redis.py</code></li>
-                <li><strong>Connect:</strong> <code>nc 127.0.0.1 6379</code> (or <code>telnet 127.0.0.1 6379</code>)</li>
-                <li><strong>Use it:</strong> Try <code>SET</code>, <code>GET</code>, and <code>DEL</code> commands!</li>
-            </ol>
-        </div>
-    </section>
-
-    <section>
-        <div class="container">
-            <h2>Architecture</h2>
-            <div class="terminal">
-                <div><span class="cmd">MiniRedis</span> <span class="out">→ Core storage engine (thread-safe)</span></div>
-                <div><span class="cmd">CommandParser</span> <span class="out">→ Parses &amp; dispatches commands</span></div>
-                <div><span class="cmd">PersistenceManager</span> <span class="out">→ AOF file logging &amp; recovery</span></div>
-                <div><span class="cmd">RedisServer</span> <span class="out">→ Multi-threaded TCP server</span></div>
+            <div class="sec-head">
+                <span class="kicker">Syntax</span>
+                <h2>Simple, familiar commands.</h2>
+                <p>Just like the real thing — easy to remember, easy to use.</p>
+            </div>
+            <div class="cmd-card">
+                <div class="cmd-row">
+                    <div class="cmd"><code>SET</code> key value</div>
+                    <div class="desc">Store a key-value pair</div>
+                    <div class="example">→ <span class="resp">OK</span></div>
+                </div>
+                <div class="cmd-row">
+                    <div class="cmd"><code>GET</code> key</div>
+                    <div class="desc">Retrieve a value</div>
+                    <div class="example">→ <span class="resp">value</span></div>
+                </div>
+                <div class="cmd-row">
+                    <div class="cmd"><code>DEL</code> key</div>
+                    <div class="desc">Delete a key</div>
+                    <div class="example">→ <span class="resp">(integer) 1</span></div>
+                </div>
+                <div class="cmd-row">
+                    <div class="cmd"><code>QUIT</code></div>
+                    <div class="desc">Disconnect from server</div>
+                    <div class="example">→ <span class="resp">+OK Goodbye!</span></div>
+                </div>
             </div>
         </div>
     </section>
+
+    <section id="run">
+        <div class="container">
+            <div class="sec-head">
+                <span class="kicker">Get Started</span>
+                <h2>Running it is trivial.</h2>
+                <p>Clone, run, connect. No dependencies, no setup headaches.</p>
+            </div>
+            <div class="steps">
+                <div class="step">
+                    <div class="num">1</div>
+                    <b>Clone</b>
+                    <p><code>git clone https://github.com/IqraSayyed/MicroRedis.git</code></p>
+                </div>
+                <div class="step">
+                    <div class="num">2</div>
+                    <b>Start</b>
+                    <p><code>cd MicroRedis && python mini_redis.py</code></p>
+                </div>
+                <div class="step">
+                    <div class="num">3</div>
+                    <b>Connect</b>
+                    <p><code>nc localhost 6379</code> or <code>telnet localhost 6379</code></p>
+                </div>
+                <div class="step">
+                    <div class="num">4</div>
+                    <b>Use it</b>
+                    <p>Try <code>SET</code>, <code>GET</code> and <code>DEL</code> commands!</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="cta">
+        <div class="container">
+            <div class="cta-box">
+                <h2>Built for learning.<br>Ready to explore.</h2>
+                <p>Dive into the code and see how a real database engine works under the hood.</p>
+                <a class="btn" href="https://github.com/IqraSayyed/MicroRedis" target="_blank">★ Star it on GitHub</a>
+            </div>
+        </div>
+    </div>
 
     <footer>
         <div class="container">
             <p>Built from scratch to learn database internals, networking, and system design.</p>
-            <p>🔗 <a href="https://github.com/IqraSayyed/MicroRedis">View on GitHub</a></p>
-            <p style="margin-top:10px; font-size:0.85rem;">© 2026 Iqra Sayyed · MicroRedis · MIT License</p>
+            <p style="margin-top:6px;">© 2026 Iqra Sayyed · <a href="https://github.com/IqraSayyed/MicroRedis">MicroRedis</a> · MIT License</p>
         </div>
     </footer>
 </body>
