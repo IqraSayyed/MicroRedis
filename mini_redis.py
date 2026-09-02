@@ -796,6 +796,12 @@ if __name__ == "__main__":
     print("  Client 2: DEL counter")
     print("\n" + "=" * 70 + "\n")
 
+    # Cloud deployment: read PORT from environment (provided by Render/Railway/etc.)
+    # and bind to 0.0.0.0 so the server is reachable from outside the container.
+    # Locally, it falls back to 127.0.0.1:6379.
+    port = int(os.environ.get("PORT", 6379))
+    host = os.environ.get("HOST", "0.0.0.0")
+
     # Create and start the multi-threaded server
-    server = RedisServer(host="127.0.0.1", port=6379)
+    server = RedisServer(host=host, port=port)
     server.start()

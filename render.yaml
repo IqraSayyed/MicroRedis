@@ -1,0 +1,14 @@
+# Render Blueprint - deploy MicroRedis as a free web service
+# Docs: https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: microredis
+    runtime: python
+    plan: free
+    buildCommand: ""
+    startCommand: python mini_redis.py
+    healthCheckPath: /
+    envVars:
+      - key: HOST
+        value: 0.0.0.0
