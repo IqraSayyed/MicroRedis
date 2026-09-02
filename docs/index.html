@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MicroRedis - A Redis Clone in Python</title>
+    <style>
+        :root {
+            --bg: #0d1117;
+            --card: #161b22;
+            --border: #30363d;
+            --text: #e6edf3;
+            --muted: #8b949e;
+            --red: #ff6b6b;
+            --accent: #58a6ff;
+            --green: #3fb950;
+            --purple: #bc8cff;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        .container { max-width: 900px; margin: 0 auto; padding: 0 20px; }
+        header {
+            padding: 60px 0 30px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+        .logo {
+            font-size: 4rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, var(--red), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .tagline {
+            color: var(--muted);
+            font-size: 1.2rem;
+            margin-top: 10px;
+        }
+        .badges {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .badge {
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+        .badge.green { color: var(--green); border-color: var(--green); }
+        .badge.red { color: var(--red); border-color: var(--red); }
+        .badge.blue { color: var(--accent); border-color: var(--accent); }
+        .badge.purple { color: var(--purple); border-color: var(--purple); }
+        section { padding: 50px 0; }
+        h2 {
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            color: var(--accent);
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .feature {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 25px;
+            transition: transform 0.2s;
+        }
+        .feature:hover { transform: translateY(-4px); }
+        .feature .icon { font-size: 2rem; margin-bottom: 12px; }
+        .feature h3 { margin-bottom: 8px; color: var(--text); }
+        .feature p { color: var(--muted); font-size: 0.95rem; }
+        .terminal {
+            background: #010409;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+        }
+        .terminal .cmd { color: var(--green); }
+        .terminal .out { color: var(--muted); }
+        .terminal .err { color: var(--red); }
+        code {
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', monospace;
+            font-size: 0.9em;
+            color: var(--accent);
+        }
+        .steps {
+            list-style: none;
+            counter-reset: step;
+        }
+        .steps li {
+            counter-increment: step;
+            margin-bottom: 15px;
+            padding-left: 45px;
+            position: relative;
+        }
+        .steps li::before {
+            content: counter(step);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 30px;
+            height: 30px;
+            background: var(--accent);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 30px 0;
+            text-align: center;
+            color: var(--muted);
+        }
+        footer a { color: var(--accent); text-decoration: none; }
+        .btn {
+            display: inline-block;
+            background: var(--accent);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+        .btn:hover { background: #4a9cf8; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">MICROREDIS</div>
+            <p class="tagline">A multi-threaded Redis clone built from scratch in Python</p>
+            <div class="badges">
+                <span class="badge green">🐍 Python 3</span>
+                <span class="badge red">⚡ In-Memory</span>
+                <span class="badge blue">🧵 Multi-Threaded</span>
+                <span class="badge purple">💾 AOF Persistence</span>
+                <span class="badge">🌐 TCP Server</span>
+            </div>
+        </div>
+    </header>
+
+    <section>
+        <div class="container">
+            <h2>Try It Live</h2>
+            <div class="terminal">
+                <div><span class="cmd">$ python mini_redis.py</span></div>
+                <div><span class="out">[SERVER] MiniRedis server started on 127.0.0.1:6379</span></div>
+                <div><span class="out">[SERVER] Multi-threaded mode: Each client gets its own thread</span></div>
+                <div><span class="out">[SERVER] Waiting for client connections...</span></div>
+                <br>
+                <div><span class="out"># From another terminal:</span></div>
+                <div><span class="cmd">$ nc 127.0.0.1 6379</span></div>
+                <div><span class="cmd">SET username Iqra</span> <span class="out">→ OK</span></div>
+                <div><span class="cmd">GET username</span> <span class="out">→ Iqra</span></div>
+                <div><span class="cmd">DEL username</span> <span class="out">→ (integer) 1</span></div>
+                <div><span class="cmd">GET username</span> <span class="out">→ (nil)</span></div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <h2>What It Can Do</h2>
+            <div class="features">
+                <div class="feature">
+                    <div class="icon">⚡</div>
+                    <h3>In-Memory Storage</h3>
+                    <p>Lightning-fast key-value storage entirely in RAM, powered by Python dictionaries.</p>
+                </div>
+                <div class="feature">
+                    <div class="icon">🧵</div>
+                    <h3>Multi-Threaded</h3>
+                    <p>Handles many clients simultaneously. Each connection runs on its own thread with locks for safety.</p>
+                </div>
+                <div class="feature">
+                    <div class="icon">🌐</div>
+                    <h3>TCP Networking</h3>
+                    <p>A real TCP socket server built with Python's <code>socket</code> library, so clients connect over the network.</p>
+                </div>
+                <div class="feature">
+                    <div class="icon">💾</div>
+                    <h3>AOF Persistence</h3>
+                    <p>Append-Only File logging means your data survives crashes and restarts.</p>
+                </div>
+                <div class="feature">
+                    <div class="icon">🗣️</div>
+                    <h3>Redis-Style Commands</h3>
+                    <p>Understands <code>SET</code>, <code>GET</code>, and <code>DEL</code> with proper error handling and case-insensitive parsing.</p>
+                </div>
+                <div class="feature">
+                    <div class="icon">🛡️</div>
+                    <h3>Thread-Safe</h3>
+                    <p>Uses <code>threading.Lock()</code> to prevent race conditions when many clients write at once.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <h2>Run It Yourself</h2>
+            <ol class="steps">
+                <li><strong>Clone the repo:</strong> <code>git clone https://github.com/IqraSayyed/MicroRedis.git</code></li>
+                <li><strong>Start the server:</strong> <code>cd MicroRedis && python mini_redis.py</code></li>
+                <li><strong>Connect:</strong> <code>nc 127.0.0.1 6379</code> (or <code>telnet 127.0.0.1 6379</code>)</li>
+                <li><strong>Use it:</strong> Try <code>SET</code>, <code>GET</code>, and <code>DEL</code> commands!</li>
+            </ol>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <h2>Architecture</h2>
+            <div class="terminal">
+                <div><span class="cmd">MiniRedis</span> <span class="out">→ Core storage engine (thread-safe)</span></div>
+                <div><span class="cmd">CommandParser</span> <span class="out">→ Parses &amp; dispatches commands</span></div>
+                <div><span class="cmd">PersistenceManager</span> <span class="out">→ AOF file logging &amp; recovery</span></div>
+                <div><span class="cmd">RedisServer</span> <span class="out">→ Multi-threaded TCP server</span></div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>Built from scratch to learn database internals, networking, and system design.</p>
+            <p>🔗 <a href="https://github.com/IqraSayyed/MicroRedis">View on GitHub</a></p>
+            <p style="margin-top:10px; font-size:0.85rem;">© 2026 Iqra Sayyed · MicroRedis · MIT License</p>
+        </div>
+    </footer>
+</body>
+</html>
